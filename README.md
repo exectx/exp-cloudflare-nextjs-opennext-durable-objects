@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Experiment `Single Cloudflare Worker` + NextJS + Durable Objects + OpenNext
 
-## Getting Started
+This is an experiment to see how to run Durable Objects in the same worker as a Next.js app using `opennext-cloudflare`.
+The idea is to have a single worker that serves both the Next.js app and the Durable Object.
 
-First, run the development server:
+
+![Screenshot of demo using Durable Object + NextJS + OpenNext Cloudflare](./demo.png)
+
+
+> [!WARNING]
+> This is a hack; it basically wraps the build output of `opennext-cloudflare` and adds a named export that points to the Durable Object class.
+> You won't be able to use the development server, and you'll have to build the app every time you make changes to the Next.js app.
+> This is based on one of the official Cloudflare Astro [templates](https://github.com/cloudflare/templates/blob/3ecfc97322d771cda2c2428cacdc1b5cf916e6e0/saas-admin-template/package.json#L57)
+
+## Steps
+
+1. Comment out the Durable Object in the `wrangler.jsonc` file
+
+2. Build the Next.js app:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm build:cf
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Wrap the build output entry file:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm add:durable-object
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Uncomment the Durable Object in the `wrangler.jsonc` file
 
-## Learn More
+5. Run the worker:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm wrangler dev
+```
